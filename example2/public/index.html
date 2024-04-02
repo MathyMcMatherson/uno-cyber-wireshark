@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        #messages li {
+            padding: 5px 10px;
+        }
+        #messages li:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <input type="text" id="messageInput" placeholder="Type your message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const ws = new WebSocket(`ws://${window.location.host}`);
+
+        ws.onopen = function() {
+            console.log('Connected to WebSocket server');
+        };
+
+        ws.onmessage = async function(event) {
+            const messages = document.getElementById('messages');
+            const li = document.createElement('li');
+			//console.log(event);
+			let data = event.data;
+			let text = await data.text();
+            li.textContent = text;
+            messages.appendChild(li);
+        };
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            ws.send(message);
+            messageInput.value = '';
+        }
+    </script>
+</body>
+</html>
